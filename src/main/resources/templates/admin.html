@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Страница администратора</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+</head>
+<body>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light">
+  <h1 class="mt-3">Admin panel</h1>
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link"  href="#users-table" data-bs-toggle="tab">Users table</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#new-user" data-bs-toggle="tab">New User</a>
+    </li>
+  </ul>
+  <div class="tab-content mt-4">
+    <div class="tab-pane fade" id="users-table">
+      <div class="header-section mb-1" style="background-color: #e9ecef; border-bottom: 2px solid #dee2e6; padding: 0.5rem 1rem;">
+        <h3>All users</h3>
+      </div>
+      <table class="table table-striped ">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Email</th>
+          <th>Age</th>
+          <th>Roles</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editUserForm" th:action="@{/admin/saveUserAfterUpdate}" method="post">
+          <div class="mb-3">
+            <label for="editUserId" class="form-label fw-bold">ID</label>
+            <input type="text" class="form-control bg-light" id="editUserId" name="id" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="editFirstName" class="form-label fw-bold">First Name</label>
+            <input type="text" class="form-control" id="editFirstName" name="firstName">
+          </div>
+          <div class="mb-3">
+            <label for="editLastName" class="form-label fw-bold">Last Name</label>
+            <input type="text" class="form-control" id="editLastName" name="lastName">
+          </div>
+          <div class="mb-3">
+            <label for="editAge" class="form-label fw-bold">Age</label>
+            <input type="number" class="form-control" id="editAge" name="age">
+          </div>
+          <div class="mb-3">
+            <label for="editEmail" class="form-label fw-bold">Email</label>
+            <input type="text" class="form-control" id="editEmail" name="email">
+          </div>
+          <div class="mb-3">
+            <label for="editPassword" class="form-label fw-bold">Password</label>
+            <input type="password" class="form-control" id="editPassword" name="password">
+          </div>
+          <div class="mb-3">
+            <label for="editRoles" class="form-label fw-bold">Roles</label>
+            <select class="form-select" id="editRoles" name="roles" multiple>
+              <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.authority}"></option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" form="editUserForm">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteUserModalLabel">Delete User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="deleteUserForm" th:action="@{/admin/deleteUser}" method="post">
+          <div class="mb-3">
+            <label for="deleteUserId" class="form-label fw-bold">ID</label>
+            <input type="text" class="form-control bg-light" id="deleteUserId" name="id" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="deleteFirstName" class="form-label fw-bold">First Name</label>
+            <input type="text" class="form-control bg-light" id="deleteFirstName" name="firstName" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="deleteLastName" class="form-label fw-bold">Last Name</label>
+            <input type="text" class="form-control bg-light" id="deleteLastName" name="lastName" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="deleteAge" class="form-label fw-bold">Age</label>
+            <input type="number" class="form-control bg-light" id="deleteAge" name="age" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="deleteEmail" class="form-label fw-bold">Email</label>
+            <input type="text" class="form-control bg-light" id="deleteEmail" name="email" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="deleteRoles" class="form-label fw-bold">Roles</label>
+            <select class="form-select bg-light" id="deleteRoles" name="roles" multiple disabled>
+              <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.authority}"></option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-danger" form="deleteUserForm">Delete User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const usersTableBody = document.getElementById("usersTableBody");
+
+  // Загрузка данных с сервера
+  function loadUsers() {
+    fetch("/admin/users")
+            .then((response) => response.json())
+            .then((users) => {
+              usersTableBody.innerHTML = "";
+              users.forEach((user) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.firstName}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.age}</td>
+                        <td>${user.email}</td>
+                        <td>${user.roles}</td>
+                        <td>
+                            <button class="btn btn-info btn-sm" onclick="editUser(${user.id})">Edit</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>
+                        </td>
+                    `;
+                usersTableBody.appendChild(row);
+              });
+            });
+  }
+  //
+  // // Добавление нового пользователя
+  // document.getElementById("addUserForm").addEventListener("submit", (event) => {
+  //   event.preventDefault();
+  //
+  //   const newUser = {
+  //     firstName: document.getElementById("firstName").value,
+  //     lastName: document.getElementById("lastName").value,
+  //     age: document.getElementById("age").value,
+  //     email: document.getElementById("email").value,
+  //     roles: Array.from(document.getElementById("roles").selectedOptions).map((option) => ({
+  //       id: option.value,
+  //     })),
+  //   };
+  //
+  //   fetch("/admin/users", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(newUser),
+  //   })
+  //           .then((response) => {
+  //             if (!response.ok) {
+  //               throw new Error("Error adding user");
+  //             }
+  //             return response.json();
+  //           })
+  //           .then(() => {
+  //             $("#addUserModal").modal("hide");
+  //             loadUsers();
+  //           })
+  //           .catch((error) => console.error("Error:", error));
+  // });
+
+  // Удаление пользователя
+  window.deleteUser = function (id) {
+    fetch(`/admin/users/${id}`, { method: "DELETE" })
+            .then(() => loadUsers())
+            .catch((error) => console.error("Error:", error));
+  };
+    window.editUser = function (id) {
+      fetch(`/admin/users/${id}`, { method: "PUT" })
+              .then(() => loadUsers())
+              .catch((error) => console.error("Error:", error));
+    };
+
+  // Загрузка списка пользователей при загрузке страницы
+  loadUsers();
+});
+</script>
+
+</body>
+</html>

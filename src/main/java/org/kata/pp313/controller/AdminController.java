@@ -34,49 +34,49 @@ public class AdminController {
         return getAdminPage(userDetails, model);
     }
 
-    @PostMapping("/add")
-    public String addUser(@Valid @ModelAttribute("newUser") User user, BindingResult bindingResult,
-                          @RequestParam(value = "roles", required = false) List<Integer> listRoleId,
-                          @AuthenticationPrincipal UserDetails userDetails,
-                          Model model) {
-        if (listRoleId == null || listRoleId.isEmpty()) {
-            bindingResult.rejectValue("roles", "error.newUser", "Choose a role");
-        }
-        if (userService.existsUserByEmail(user.getEmail())) {
-            bindingResult.rejectValue("email", "error.newUser", "This email already exists");
-        }
-        if (user.getAge() < 18) {
-            bindingResult.rejectValue("age", "error.newUser", "Age must be at least 18");
-        }
-        if (bindingResult.hasErrors()) {
-            System.out.println("binding results has errors");
-            model.addAttribute("bindingResult", bindingResult);
-            System.out.println(bindingResult.getAllErrors());
-            model.addAttribute("newUser", user);
-            model.addAttribute("activeTab", "new-user");
-            return getAdminPage(userDetails, model);
-        }
-        List<Role> roles = roleService.getRolesByListId(listRoleId);
-        user.setRoles(new HashSet<>(roles));
-        userService.addUser(user);
-        return "redirect:/admin";
-    }
-
-    @PostMapping("/saveUserAfterUpdate")
-    public String saveUserAfterUpdate(@Valid User user, BindingResult bindingResult, Model model) {
-        if (user.getAge() < 18) {
-            bindingResult.rejectValue("age", "error.newUser", "Age must be at least 18");
-        }
-        if (bindingResult.hasErrors()) {
-            return "redirect:/admin";
-        }
-        try {
-            userService.updateUser(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "redirect:/admin";
-    }
+//    @PostMapping("/add")
+//    public String addUser(@Valid @ModelAttribute("newUser") User user, BindingResult bindingResult,
+//                          @RequestParam(value = "roles", required = false) List<Integer> listRoleId,
+//                          @AuthenticationPrincipal UserDetails userDetails,
+//                          Model model) {
+//        if (listRoleId == null || listRoleId.isEmpty()) {
+//            bindingResult.rejectValue("roles", "error.newUser", "Choose a role");
+//        }
+//        if (userService.existsUserByEmail(user.getEmail())) {
+//            bindingResult.rejectValue("email", "error.newUser", "This email already exists");
+//        }
+//        if (user.getAge() < 18) {
+//            bindingResult.rejectValue("age", "error.newUser", "Age must be at least 18");
+//        }
+//        if (bindingResult.hasErrors()) {
+//            System.out.println("binding results has errors");
+//            model.addAttribute("bindingResult", bindingResult);
+//            System.out.println(bindingResult.getAllErrors());
+//            model.addAttribute("newUser", user);
+//            model.addAttribute("activeTab", "new-user");
+//            return getAdminPage(userDetails, model);
+//        }
+//        List<Role> roles = roleService.getRolesByListId(listRoleId);
+//        user.setRoles(new HashSet<>(roles));
+//        userService.addUser(user);
+//        return "redirect:/admin";
+//    }
+//
+//    @PostMapping("/saveUserAfterUpdate")
+//    public String saveUserAfterUpdate(@Valid User user, BindingResult bindingResult, Model model) {
+//        if (user.getAge() < 18) {
+//            bindingResult.rejectValue("age", "error.newUser", "Age must be at least 18");
+//        }
+//        if (bindingResult.hasErrors()) {
+//            return "redirect:/admin";
+//        }
+//        try {
+//            userService.updateUser(user);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return "redirect:/admin";
+//    }
 
     private String getAdminPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         String email = userDetails.getUsername();
@@ -87,14 +87,17 @@ public class AdminController {
         model.addAttribute("roles", roleService.getRoles());
         return "adminPage";
     }
-
-    @PostMapping("/deleteUser")
-    public String deleteUser(@RequestParam("id") int id) {
-        userService.deleteUserById(id);
-        return "redirect:/admin";
-    }
-
 }
+
+//    @PostMapping("/deleteUser")
+//    public String deleteUser(@RequestParam("id") int id) {
+//        userService.deleteUserById(id);
+//        return "redirect:/admin";
+//    }
+//
+//}
+
+//------------------------------------------------------------------------
 
 //    @GetMapping("")
 //    public String usersInfo(Model model) {

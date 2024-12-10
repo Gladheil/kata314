@@ -12,8 +12,8 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
         <span class="navbar-text text-light">
-            <strong th:text="${userEmail}"></strong> with roles:
-            <span th:each="role : ${userRoles}" th:text="${role.authority.replace('ROLE_', '')} + ' '"></span>
+            <span id="userEmail"></span> with roles:
+            <span id="userRoles"></span>
         </span>
         <a href="/logout" class="btn btn-outline-light">Logout</a>
     </div>
@@ -48,20 +48,43 @@
                         <th>Role</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td th:text = "${user.id}"></td>
-                        <td th:text = "${user.firstName}"></td>
-                        <td th:text = "${user.lastName}"></td>
-                        <td th:text = "${user.age}"></td>
-                        <td th:text = "${user.email}"></td>
-                        <td th:text = "${user.roles}"></td>
-                    </tr>
+                    <tbody id="usersTableBody">
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("/users/info")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("userEmail").textContent = data.userEmail;
+                document.getElementById("userRoles").textContent = data.userRoles;
+            })
+            .catch(error => {
+                console.error("Error with loading auth data: ", error)
+            });
+
+        const usersTableBody = document.getElementById("usersTableBody");
+        fetch("/users/user")
+            .then(response => response.json())
+            .then(user => {
+                const row = document.createElement("tr");
+                const roles = user.roles.map(role => role.authority.replace("ROLE_", "")).join(", ");
+                row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.firstName}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.age}</td>
+                        <td>${user.email}</td>
+                        <td>${roles}</td>
+                        `;
+                usersTableBody.appendChild(row);
+            })
+    });
+</script>
 </body>
 </html>

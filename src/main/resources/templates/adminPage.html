@@ -13,8 +13,8 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
         <span class="navbar-text text-light">
-            <strong th:text="${userEmail}"></strong> with roles:
-            <span th:each="role : ${userRoles}" th:text="${role.authority.replace('ROLE_', '')} + ' '"></span>
+            <span id="userEmail"></span> with roles:
+            <span id="userRoles"></span>
         </span>
         <a href="/logout" class="btn btn-outline-light">Logout</a>
     </div>
@@ -68,38 +68,37 @@
                     <div class="header-section mb-3" style="background-color: #e9ecef; border-bottom: 2px solid #dee2e6; padding: 0.5rem 1rem; text-align: center;">
                         <h3>Add new user</h3>
                     </div>
-                    <form th:object="${newUser}" id="addUserForm" class="text-center">
+                    <form id="addUserForm" class="text-center">
                         <div class="mb-3">
                             <label for="firstName" class="form-label" style="font-weight: bold;">First name</label>
-                            <input type="text" class="form-control w-25 mx-auto" id="firstName" th:field="*{firstName}"required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName} "></div>
+                            <input type="text" class="form-control w-25 mx-auto" id="firstName" required>
+<!--                            <div class="text-danger" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName} "></div>-->
                         </div>
                         <div class="mb-3">
                             <label for="lastName" class="form-label" style="font-weight: bold;">Last name</label>
-                            <input type="text" class="form-control w-25 mx-auto" id="lastName" th:field="*{lastName}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                            <input type="text" class="form-control w-25 mx-auto" id="lastName" required>
+<!--                            <div class="text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>-->
                         </div>
                         <div class="mb-3">
                             <label for="age" class="form-label" style="font-weight: bold;">Age</label>
-                            <input type="number" class="form-control w-25 mx-auto" id="age" th:field="*{age}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
+                            <input type="number" class="form-control w-25 mx-auto" id="age" required>
+<!--                            <div class="text-danger" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>-->
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label" style="font-weight: bold;">Email</label>
-                            <input type="text" class="form-control w-25 mx-auto" id="email" th:field="*{email}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            <input type="text" class="form-control w-25 mx-auto" id="email" required>
+<!--                            <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>-->
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label" style="font-weight: bold;">Password</label>
-                            <input type="password" class="form-control w-25 mx-auto" id="password" th:field="*{password}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            <input type="password" class="form-control w-25 mx-auto" id="password" required>
+<!--                            <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>-->
                         </div>
                         <div class="mb-3">
-                            <label for="role" class="form-label" style="font-weight: bold;">Role</label>
-                            <select class="form-select w-25 mx-auto" id="role" th:field="*{roles}" multiple>
-                                <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.authority}"></option>
+                            <label for="roles" class="form-label" style="font-weight: bold;">Role</label>
+                            <select class="form-select w-25 mx-auto" id="roles" multiple>
                             </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></div>
+<!--                            <div class="text-danger" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></div>-->
                         </div>
                         <button type="submit" class="btn btn-success" id="addButton">Add new user</button>
                     </form>
@@ -144,7 +143,6 @@
                     <div class="mb-3">
                         <label for="editRoles" class="form-label fw-bold">Roles</label>
                         <select class="form-select" id="editRoles" name="roles" multiple>
-                            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.authority}"></option>
                         </select>
                     </div>
                 </form>
@@ -188,7 +186,6 @@
                     <div class="mb-3">
                         <label for="deleteRoles" class="form-label fw-bold">Roles</label>
                         <select class="form-select bg-light" id="deleteRoles" name="roles" multiple disabled>
-                            <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.authority}"></option>
                         </select>
                     </div>
                 </form>
@@ -202,6 +199,16 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        fetch("/admin/user")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("userEmail").textContent = data.userEmail;
+                document.getElementById("userRoles").textContent = data.userRoles;
+            })
+            .catch(error => {
+                console.error("Error with loading auth data: ", error)
+            });
+
         const usersTableBody = document.getElementById("usersTableBody");
         function loadUsers() {
             fetch("/admin/users")
@@ -312,7 +319,7 @@
             const age = document.getElementById("age").value;
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
-            const roles = Array.from(document.getElementById("role").selectedOptions).map(option => ({
+            const roles = Array.from(document.getElementById("roles").selectedOptions).map(option => ({
                 id: option.value,
                 authority: option.text
             }));
@@ -434,6 +441,51 @@
                 })
                 .catch(error => console.error("Error:", error));
         };
+        const rolesSelect = document.getElementById("roles");
+        fetch("/admin/roles")
+            .then(response => response.json())
+            .then(roles => {
+                rolesSelect.innerHTML = "";
+                roles.forEach(role => {
+                    const option = document.createElement("option");
+                    option.value = role.id;
+                    option.textContent = role.authority;
+                    rolesSelect.appendChild(option);
+                })
+            })
+            .catch(error => {
+                console.error("Error loading roles: ", error);
+            })
+        const rolesEdit = document.getElementById("editRoles");
+        fetch("/admin/roles")
+            .then(response => response.json())
+            .then(roles => {
+                rolesEdit.innerHTML = "";
+                roles.forEach(role => {
+                    const option = document.createElement("option");
+                    option.value = role.id;
+                    option.textContent = role.authority;
+                    rolesEdit.appendChild(option);
+                })
+            })
+            .catch(error => {
+                console.error("Error loading roles: ", error);
+            })
+        const rolesDelete = document.getElementById("deleteRoles");
+        fetch("/admin/roles")
+            .then(response => response.json())
+            .then(roles => {
+                rolesDelete.innerHTML = "";
+                roles.forEach(role => {
+                    const option = document.createElement("option");
+                    option.value = role.id;
+                    option.textContent = role.authority;
+                    rolesDelete.appendChild(option);
+                })
+            })
+            .catch(error => {
+                console.error("Error loading roles: ", error);
+            })
         loadUsers();
     });
 </script>
